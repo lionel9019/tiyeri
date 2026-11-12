@@ -1,0 +1,40 @@
+aleurodes (mouches blanches)
+alternariose de la carotte
+altises_carotte
+cercosporiose de la carotte
+charbon du maïs
+feuilles jaunes (carence en azote)
+flétrissement (manque d'eau)
+fonte des semis_carotte
+fusariose moniliforme (gigantisme du riz ou bakanae)
+helminthosporiose du riz
+la brûlure bactérienne du riz
+la carie du riz
+la maladie des stries bactériennes
+le faux charbon du riz
+le grassy stunt (nanisme herbacé) du riz
+les ravageurs du riz
+les viroses du maïs
+mildiou de la carotte
+mildiou de la tomate
+mouche de la carotte (psila rosae)
+nématodes du riz
+nématodes à galles_carotte
+nématodes à kystes_carotte
+oïdium de la carotte
+oïdium de tomate
+pourriture de la tige du riz
+pourriture molle bactérienne_carotte
+puceron cendré_carotte
+pucerons_carotte
+pyriculariose (brûlure du riz)
+pythium spp_carotte
+ravageur du maïs
+rhizoctone brun_carotte
+sain (aucune anomalie visible)
+sclérotiniose_carotte
+sphacelotheca
+tache bactérienne_tomate
+thrips
+tungro du riz
+tuta absoluta (mineuse de la tomate)

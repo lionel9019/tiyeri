@@ -1,0 +1,31 @@
+{
+  "Tomato_healthy": {
+    "nom": "Tomate (santé)",
+    "scientific_name": "Solanum lycopersicum",
+    "origin": "Amérique du Sud",
+    "soil": "Sols meubles, riches en matière organique",
+    "varieties": ["Roma", "Cherry", "Beefsteak"],
+    "yield_per_season": "10-20 t/ha (selon variété et pratiques)",
+    "nutrition": {
+      "calcium_mg": 10,
+      "iron_mg": 0.5,
+      "vitamin_c_mg": 13
+    },
+    "toxicity": "Comestible, feuilles légèrement toxiques si ingérées en grande quantité",
+    "medicinal": "Contient des antioxydants (lycopène) ; usages topiques limités",
+    "products": ["Sauce", "Concentré", "Purée", "Tomates séchées"],
+    "planting_seasons": "Selon climat; généralement printemps/été"
+  },
+  "Tomato_Late_blight": {
+    "nom": "Mildiou tardif",
+    "scientific_name": "Phytophthora infestans (pathogen)",
+    "origin": "Pathogène cosmopolite",
+    "soil": "N/A",
+    "varieties": [],
+    "yield_per_season": "Réduit fortement si non traité",
+    "toxicity": null,
+    "medicinal": null,
+    "products": [],
+    "planting_seasons": ""
+  }
+}

@@ -1,0 +1,50 @@
+
+# ==============================
+# FICHIERS PYTHON TEMPORAIRES
+# ==============================
+__pycache__/
+*.py[cod]
+*$py.class
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ==============================
+# ENVIRONNEMENTS VIRTUELS
+# ==============================
+.venv/
+venv/
+ENV/
+
+# ==============================
+# VARIABLES ET SECRETS
+# ==============================
+.env
+.env.*
+!.env.example
+
+# ==============================
+# FICHIERS TEMPORAIRES
+# ==============================
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# ==============================
+# DONNEES PERSONNELLES
+# ==============================
+backend/static/profile_photos/user_5.*
+
+# Artefacts temporaires de création de structure
+**/__pycache__f/
+create_structure.py
+
+# Fichier de vérification des identifiants administrateur
+/test_password.py
+
+# Résultats de recherche pouvant contenir des jetons
+/frontend/token_search_results.txt

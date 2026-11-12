@@ -1,0 +1,18 @@
+{
+  "maïs": [
+    "https://agriculture.gouv.fr/guide-technique-mais.pdf",
+    "https://www.cirad.fr/mais/calendrier"
+  ],
+  "pomme": [
+    "https://www.inrae.fr/pomme/production",
+    "https://agrobenin.org/pomme-de-terre-guide"
+  ],
+  "ortie": [
+    "https://hortiauray.com/fiches-plantes/ortie.pdf",
+    "https://lejardinbio.com/ortie-culture-utilisation"
+  ],
+  "soja": [
+    "https://agriresources.org/soja-culture-techniques",
+    "https://fiche-agronome.org/soja-manuel"
+  ]
+}

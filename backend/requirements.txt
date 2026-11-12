@@ -1,0 +1,50 @@
+# Base de données
+mysql-connector-python==9.3.0
+pymysql
+sqlalchemy
+alembic
+
+# Gestion configuration / environnement
+python-decouple==3.8
+python-dotenv==1.1.1
+
+# Framework web
+fastapi
+uvicorn[standard]
+pydantic
+passlib[bcrypt]
+python-multipart
+email-validator
+
+# Traitement texte / NLP
+langdetect
+spacy>=3.0.0
+transformers==4.40.2
+sentence-transformers==2.7.0
+deep-translator
+rapidfuzz==3.9.7
+PyJWT
+python-jose
+
+# Scraping / Recherche
+beautifulsoup4
+requests==2.32.3
+wikipedia
+duckduckgo-search
+
+# Traitement fichiers
+python-docx
+PyPDF2
+Pillow
+
+# Machine learning / Vision
+torch==2.3.0
+torchvision==0.18.0
+opencv-python
+scikit-learn
+numpy
+
+# TensorFlow + compatibilité Keras
+#tensorflow>=2.16.0
+tensorflow
+tf-keras==2.15.0

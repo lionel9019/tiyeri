@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>Chat TIYERI IA</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f2f7f5;
+  }
+  .modal-content {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  #chat-box {
+    height: 300px;
+    overflow-y: auto;
+    background: #faf9f9;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    white-space: pre-wrap; /* Pour respecter les sauts de ligne */
+  } 
+  #chat-form {
+    display: flex;
+    gap: 10px;
+  }
+  #chat-inputa {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc; 
+  }
+  #chat-form button {
+    padding: 10px 20px;
+    background-color: #007E33;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .ia-typing {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 5px;
+  }
+</style>
+</head>
+<body>
+  <div class="modal-content">
+    <h2>👩🏾‍🌾 Chat avec TIYERI IA</h2>
+    <div id="chat-box">
+      
+    </div>
+    <form id="chat-form">
+      <input type="text" id="chat-inputa" placeholder="Posez une question..." required />
+      <button type="submit">Envoyer</button>
+    </form><br/>
+  </div>
+
+<script>
+  console.log("✅ Script chargé dans chat.html");
+
+  // Parse JWT si nécessaire (existant)
+  function parseJwt(token) {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      ).join(''));
+      return JSON.parse(jsonPayload);
+    } catch {
+      return null;
+    }
+  }
+
+  // Supprime toutes les balises HTML, y compris <br/> etc
+  function stripHtml(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || "";
+  }
+
+  // Supprime le markdown gras (**) pour affichage simple
+  function stripMarkdown(text) {
+    return text.replace(/\*\*/g, '');
+  }
+
+  // Affichage progressif lettre à lettre
+  function afficherTexteProgressif(texte, element, vitesse = 25) {
+    element.textContent = "";
+    let i = 0;
+    function afficherLettre() {
+      if (i < texte.length) {
+        element.textContent += texte.charAt(i);
+        i++;
+        setTimeout(afficherLettre, vitesse);
+      }
+    }
+    afficherLettre();
+  }
+
+  document.getElementById("chat-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const input = document.getElementById("chat-inputa");
+    const chatBox = document.getElementById("chat-box");
+    const userMessage = input.value.trim();
+    if (!userMessage) return;
+
+    // Affichage message utilisateur à droite
+    const userDiv = document.createElement("div");
+    userDiv.style.textAlign = "right";
+    userDiv.style.backgroundColor = "#e6efe6";
+    userDiv.style.padding = "5px 10px";
+    userDiv.style.margin = "5px 0";
+    userDiv.style.borderRadius = "8px";
+    userDiv.textContent = userMessage;
+    chatBox.appendChild(userDiv);
+
+    input.value = "";
+
+    // Message “TIYERI IA rédige...”
+    const typingDiv = document.createElement("div");
+    typingDiv.className = "ia-typing";
+    typingDiv.textContent = "TIYERI IA rédige...";
+    chatBox.appendChild(typingDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try {
+       console.log("Passe 1:", );
+      const response = await fetch("http://127.0.0.1:8000/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMessage })
+      });
+      
+console.log(response.status)
+
+      const data = await response.json();
+      console.log("🎯 Données brutes reçues :", data);
+console.log("Contenu complet JSON reçu :", data);
+console.log("Texte IA brut:", data.reponse || data.response);
+      typingDiv.remove();
+
+      // Nettoyer la réponse : enlever HTML + markdown gras
+      let botResponseText = data.reponse || data.response || "[Réponse non trouvée]";
+    console.log("✔️ Réponse IA avant nettoyage :", botResponseText);
+      console.log("🎯 Données brutes reçues :", data.response);
+      botResponseText = stripHtml(botResponseText);
+      botResponseText = stripMarkdown(botResponseText);
+      
+      if (!botResponseText || botResponseText.trim() === "") {
+  botResponseText = "[⚠️ Réponse vide de l'IA]";
+}
+ 
+      // Affichage progressif
+      const iaDiv = document.createElement("div");
+      iaDiv.style.textAlign = "left";
+      iaDiv.style.backgroundColor = "#fff";
+      iaDiv.style.padding = "5px 10px";
+      iaDiv.style.margin = "5px 0";
+      iaDiv.style.borderRadius = "8px";
+      chatBox.appendChild(iaDiv);
+
+      afficherTexteProgressif(botResponseText, iaDiv, 25);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+    } catch (error) {
+      typingDiv.remove();
+      console.error("❌ Erreur lors de l’appel API :", error);
+      const errorDiv = document.createElement("div");
+      errorDiv.style.color = "red";
+      errorDiv.textContent = "❌ Une erreur est survenue";
+      chatBox.appendChild(errorDiv);
+    }
+  });
+</script>
+</body>
+</html>
+

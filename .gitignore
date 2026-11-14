@@ -48,3 +48,6 @@ create_structure.py
 
 # Résultats de recherche pouvant contenir des jetons
 /frontend/token_search_results.txt
+
+# Photos personnelles du frontend
+/frontend/static/profile_photos/user_5.*

@@ -1,0 +1,95 @@
+<div class="modal-content">
+  <h2 data-i18n="diagnostic">🩺 Diagnostic par Image</h2>
+  <form id="upload-form">
+    <input type="file" id="image-input" accept="image/*" required />
+    <button type="submit" data-i18n="diagnostic_b">📷🌱Analyser</button>
+  </form>
+  <div id="image-preview"></div>
+  <div id="resultats-analyse"></div>
+</div>
+
+<style>
+  #image-preview img {
+    width: 50%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 10px;
+  }
+  #resultats-analyse p {
+    font-size: 1.1em;
+    margin-top: 15px;
+  }
+</style>
+
+<script>
+  
+const TRANSLATIONS_URL = "static/translations.json"; 
+
+async function fetchTranslations() {
+  if (translationsCache) return translationsCache;
+  const res = await fetch(TRANSLATIONS_URL);
+  translationsCache = await res.json();
+  return translationsCache;
+}
+
+document.getElementById("upload-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const fileInput = document.getElementById("image-input");
+  const preview = document.getElementById("image-preview");
+  const resultats = document.getElementById("resultats-analyse");
+
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  // Affichage de l'aperçu de l’image
+  const reader = new FileReader();
+  reader.onload = () => {
+    preview.innerHTML = `<img src="${reader.result}" alt="Aperçu image" />`;
+  };
+  reader.readAsDataURL(file);
+
+  // Préparation des données pour l'envoi
+  const formData = new FormData();
+  formData.append("file", file);
+
+  resultats.innerHTML = "<p>🕵️ Analyse en cours...</p>";
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/image/analyze", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      let errMsg = "Erreur lors de l'analyse de l'image.";
+      try {
+        const errData = await response.json();
+        if (errData && errData.detail) errMsg = errData.detail;
+      } catch {}
+      throw new Error(errMsg);
+    }
+
+    const data = await response.json();
+    console.log("✅ Réponse du backend :", data);
+
+    // Harmonisation avec les champs du backend
+    if (data.nom_diagnostic) {
+      resultats.innerHTML = `
+        <p><strong>🌿 culture :</strong> ${data.culture}</p>
+        <p><strong>🌿 Diagnostic :</strong> ${data.nom_diagnostic}</p>
+        <p><strong>ℹ️ Description :</strong> ${data.description || "N/A"}</p>
+        <p><strong>💊 Traitement :</strong> ${data.traitement || "N/A"}</p>
+        <p><strong>📝 Conseils :</strong> ${data.conseils || "N/A"}</p>
+      `;
+    } else {
+      resultats.innerHTML = `<p style="color:orange;">⚠️ Résultat inattendu reçu.</p>`;
+      console.warn("Résultat backend inattendu:", data);
+    }
+
+  } catch (error) {
+    console.error("❌ Erreur attrapée:", error);
+    resultats.innerHTML = `<p style="color:red;">❌ ${error.message}</p>`;
+  }
+});
+</script>

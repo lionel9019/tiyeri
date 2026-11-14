@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Connexion</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Connexion</h1>
+  <form onsubmit="login(event)">
+    <input type="email" id="email" placeholder="Email" required /><br />
+    <input type="password" id="password" placeholder="Mot de passe" required /><br />
+    <button type="submit">Connexion</button>
+  </form>
+
+  <script>
+    function login(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      fetch("http://127.0.0.1:8000/api/users/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+          username: email,
+          password: password
+        })
+      })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Identifiants invalides ou erreur serveur");
+          }
+          return res.json();
+        })
+        .then((data) => {
+          if (data.access_token) {
+            localStorage.setItem("access_token", data.access_token);
+            alert("Connexion réussie !");
+            window.location.href = "/accueil.html";
+          } else {
+            alert("Réponse invalide du serveur");
+          }
+        })
+        .catch((err) => {
+          alert("Échec de connexion : " + err.message);
+        });
+    }
+  </script>
+</body>
+</html>

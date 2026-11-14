@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Administration - TIYERI IA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="admin.css" />
+  <style>
+    #floating-menu {
+      position: fixed;
+      top: 80px;
+      left: 10px;
+      background: #2c3e50;
+      padding: 10px 15px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+    }
+    #floating-menu a {
+      color: white;
+      text-decoration: none;
+      display: block;
+      margin: 5px 0;
+      font-weight: bold;
+    }
+    #floating-menu a:hover {
+      text-decoration: underline;
+    }
+    .upload-section {
+      margin: 20px 0;
+    }
+    #upload-message {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .learned-phrases {
+      margin-top: 40px;
+    }
+    .learned-phrases button {
+      margin-left: 10px;
+    }
+    #user-info {
+      position: fixed;
+      top: 10px;
+      right: 20px;
+      background-color: #ecf0f1;
+      color: #2c3e50;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+    
+    #logout-btn {
+      position: fixed;
+      top: 50px;
+      right: 20px;
+      background-color: white;
+      color: #007E33;
+      border: none;
+      padding: 6px 12px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      width: auto;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      z-index: 1000;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    #logout-btn:hover {
+      background-color: #007E33;
+      color: white;
+    }
+
+  </style>
+
+  <script>
+    // Définir ici l'URL de base de l'API distante (exemple)
+    const API_BASE_URL = "http://127.0.0.1:8000"; 
+    // Remplace par ta vraie URL, sans slash final
+  </script>
+
+</head>
+<body>
+
+  <!-- 👤 Utilisateur connecté -->
+  <div id="user-info">Administrateur : ...</div>
+
+  <div id="floating-menu">
+    <a href="/admin/gestion-ressources">Gestion ressources</a>
+    <a href="/admin/gestion-utilisateurs">Gestion utilisateurs</a>
+    <a href="/admin/gestion-droits">Gestion des droits</a>
+  </div>
+
+  <header>
+    <h1>👩🏾‍💻 Interface Admin – TIYERI IA</h1>
+    <p>Gérez la mémoire du chatbot et améliorez ses réponses</p>
+  </header>
+
+   <button id="logout-btn" style="background-color:red; color:rgb(5, 66, 5);">Se déconnecter</button>
+  
+  <main>
+    <section class="add-entry">
+      <h2>➕ Ajouter / Modifier une entrée</h2>
+      <form id="entry-form">
+        <input type="text" id="question" placeholder="Question de l'utilisateur" required />
+        <textarea id="answer" placeholder="Réponse que l'IA doit donner" required></textarea>
+        <button type="submit" id="submit">Enregistrer</button>
+      </form>
+    </section>
+
+    <section class="upload-section">
+      <h2>📄 Charger un document pour apprentissage</h2>
+      <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" id="file-input" accept=".txt,.md,.json,.pdf" required />
+        <button type="submit" id="upload-btn">📤 Envoyer à l'IA</button>
+      </form>
+      <div id="upload-message"></div>
+    </section>
+
+    <section class="list-entries">
+      <h2>📚 Mémoire actuelle du chatbot</h2>
+      <ul id="chat-memory-list"></ul>
+    </section>
+
+    <section class="learned-phrases">
+      <h2>🧠 Phrases apprises à valider</h2>
+      <ul id="learned-phrase-list">⏳ Chargement...</ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>© TIYERI STARTUP | TIYERI IA | Kandi - Bénin</p>
+  </footer>
+
+  <!-- 🔒 Protection + Affichage administrateur -->
+  <script>
+     
+ document.getElementById("logout-btn").addEventListener("click", () => {
+        localStorage.removeItem("access_tokenAdmin");
+        window.location.href = "login.html";
+      });
+  const tokenAdmin = localStorage.getItem("access_tokenAdmin");
+  
+  if (!tokenAdmin) {
+     
+    window.location.href = "login.html";
+  }
+
+  
+  // 🔹 Normalisation fonction pour supprimer accents
+  function normalize(str) {
+    return str
+      ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+      : "";
+  }
+
+  // Afficher nom utilisateur connecté
+  fetch(`${API_BASE_URL}/admin/me`, {
+    headers: {
+      Authorization: "Bearer " + tokenAdmin,
+    },
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Administrateur non authentifié");
+      return res.json();
+    })
+    .then((data) => {
+      console.log("✅ Réponse /admin/me :", data);
+
+      // 🔹 Récupération du rôle (selon backend)
+      const role = normalize(data.role ||  "");
+      if (!["admin", "super_admin", "administrateur"].includes(role)) {
+        alert("⛔ Accès réservé aux administrateurs.");
+        localStorage.removeItem("access_tokenAdmin");
+        window.location.href = "login.html";
+        return;
+      }
+
+  document.getElementById("user-info").textContent =
+    "Administrateur : " + (data.username || "Admin");
+})
+     .catch((err) => {
+      console.error("Erreur /admin/me:", err);
+      document.getElementById("user-info").textContent = "Administrateur : inconnu";
+    });
+
+  // Charger phrases apprises à valider
+  async function loadLearnedPhrases() {
+  const list = document.getElementById("learned-phrase-list");
+  list.innerHTML = "⏳ Chargement...";
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/learned-phrases`, {
+      headers: {
+        "Authorization": "Bearer " + tokenAdmin,
+      },
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(errText || "Erreur inconnue");
+    }
+
+    const data = await res.json();
+    list.innerHTML = "";
+
+     if (!data || data.length === 0) {
+      list.innerHTML = "<li>✅ Aucune phrase en attente de validation.</li>";
+    } else {
+      data.forEach((entry) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <strong>${entry.phrase}</strong> → ${entry.intent || "undefined"} [${entry.langue || "fr"}]
+          <button onclick="validatePhrase(${entry.id})">✅ Valider</button>
+          <button onclick="editLearnedPhrase(${entry.id}, '${entry.phrase.replace(/'/g,"\\'")}')">✏️ Modifier</button>
+          <button onclick="deleteLearnedPhrase(${entry.id})">🗑 Supprimer</button>
+          <button onclick="rejectPhrase(${entry.id})">❌ Rejeter</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+  } catch (err) {
+    console.error("Erreur fetch:", err);
+    list.innerHTML = `<li style="color:red;">⚠️ Erreur : ${err.message}</li>`;
+  }
+}
+
+
+// ✏️ Modifier une phrase apprise
+async function editLearnedPhrase(id, oldPhrase) {
+  const newPhrase = prompt("Modifier la phrase :", oldPhrase);
+  if (!newPhrase || newPhrase === oldPhrase) return;
+
+  await fetch(`${API_BASE_URL}/admin/update-learned-phrase/${id}`, {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer " + tokenAdmin,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ phrase: newPhrase })
+  });
+  loadLearnedPhrases();
+}
+
+
+// 🗑 Supprimer une phrase apprise
+async function deleteLearnedPhrase(id) {
+  if (!confirm("Supprimer définitivement cette phrase apprise ?")) return;
+  await fetch(`${API_BASE_URL}/admin/delete-learned-phrase/${id}`, {
+    method: "DELETE",
+    headers: { "Authorization": "Bearer " + tokenAdmin },
+  });
+  loadLearnedPhrases();
+}
+ async function validatePhrase(id) {
+  await fetch(`${API_BASE_URL}/admin/validate-memory/${id}`, {   // ✅ bon endpoint
+    method: "POST",
+    headers: { "Authorization": "Bearer " + tokenAdmin },
+  });
+  loadLearnedPhrases();
+}
+
+
+  async function rejectPhrase(id) {
+    await fetch(`${API_BASE_URL}/admin/reject-phrase/${id}`, {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + tokenAdmin },
+    });
+    loadLearnedPhrases();
+  }
+
+  // Lancement initial
+  loadLearnedPhrases(); 
+ 
+  document.getElementById("upload-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const fileInput = document.getElementById("file-input");
+    const uploadBtn = document.getElementById("upload-btn");
+    const message = document.getElementById("upload-message");
+
+    if (!fileInput.files.length) {
+      alert("⚠️ Sélectionne un fichier avant d’envoyer.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    try {
+      // UI feedback : désactive le bouton et affiche état
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = "⏳ Envoi en cours...";
+      message.textContent = "Traitement en cours, merci de patienter...";
+
+      const res = await fetch(`${API_BASE_URL}/admin/upload-doc`, {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + tokenAdmin },
+        body: formData
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+
+      message.textContent = "✅ Fichier envoyé et appris avec succès.";
+      message.style.color = "green";
+
+      // Recharge la mémoire affichée
+      await loadChatMemory();
+    } catch (err) {
+      console.error("Erreur upload:", err);
+      message.textContent = "❌ Erreur lors de l’envoi : " + err.message;
+      message.style.color = "red";
+    } finally {
+      // Réinitialiser le bouton
+      uploadBtn.disabled = false;
+      uploadBtn.textContent = "📤 Envoyer à l'IA";
+    }
+  });
+
+async function loadChatMemory() {
+  const token = localStorage.getItem("access_tokenAdmin");
+  const memoryList = document.getElementById("chat-memory-list");
+  memoryList.innerHTML = "⏳ Chargement...";
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/chat-memory`, {
+      method: "GET",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    if (!response.ok) throw new Error("Impossible de charger la mémoire");
+
+    const data = await response.json();
+    memoryList.innerHTML = "";
+
+    if (!data || data.length === 0) {
+      memoryList.innerHTML = "<li>⚠️ Mémoire vide pour le moment.</li>";
+    } else {
+      data.forEach(p => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <b>${p.phrase}</b> (${p.domain || "général"}) - 
+          <i>${p.created_at}</i>
+          ${p.validated ? 
+            `<span style="color:green;">✅ Validé</span>` :
+            `<button onclick="validateMemory(${p.id})">✅ Valider</button>`}
+          <button onclick="editMemory(${p.id}, '${p.phrase.replace(/'/g,"\\'")}')">✏️ Modifier</button>
+          <button onclick="deleteMemory(${p.id})">🗑 Supprimer</button>
+        `;
+        memoryList.appendChild(li);
+      });
+    }
+  } catch (err) {
+    memoryList.innerHTML = `<li style="color:red;">Erreur : ${err.message}</li>`;
+  }
+}
+
+// ✅ Valider une phrase déjà dans la mémoire
+async function validateMemory(id) {
+  const token = localStorage.getItem("access_tokenAdmin");
+  await fetch(`${API_BASE_URL}/admin/validate-memory/${id}`, {
+    method: "POST",
+    headers: { "Authorization": "Bearer " + token },
+  });
+  loadChatMemory();
+}
+
+// 🗑 Supprimer une phrase
+async function deleteMemory(id) {
+  const token = localStorage.getItem("access_tokenAdmin");
+  if (!confirm("Supprimer définitivement cette entrée ?")) return;
+  await fetch(`${API_BASE_URL}/admin/delete-memory/${id}`, {
+    method: "DELETE",
+    headers: { "Authorization": "Bearer " + token },
+  });
+  loadChatMemory();
+}
+
+// ✏️ Modifier une phrase
+
+async function editMemory(id, oldPhrase) {
+  const token = localStorage.getItem("access_tokenAdmin");
+  const newPhrase = prompt("Modifier la phrase :", oldPhrase);
+  if (!newPhrase || newPhrase === oldPhrase) return;
+
+  await fetch(`${API_BASE_URL}/admin/update-memory/${id}`, {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ phrase: newPhrase })
+  });
+  loadChatMemory();
+}
+
+// Chargement initial
+loadChatMemory();
+</script>
+<script>document.getElementById("entry-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const question = document.getElementById("question").value.trim();
+  const answer = document.getElementById("answer").value.trim();
+
+  if (!question || !answer) {
+    alert("⚠️ Merci de remplir tous les champs.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/save-memory`, {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + tokenAdmin,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ question, answer })
+    });
+
+    // ✅ Vérification correcte
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(errText || "Erreur inconnue");
+    }
+
+    const data = await res.json(); // ✅ on parse la réponse JSON
+    alert("✅ " + data.message);
+
+    document.getElementById("entry-form").reset();
+
+    // recharge la mémoire affichée
+    await loadChatMemory();
+  } catch (err) {
+    console.error("Erreur:", err);
+    alert("❌ Erreur lors de l'enregistrement : " + err.message);
+  }
+});
+
+</script>
+
+
+  <script src="admin.js"></script>
+</body>
+</html>

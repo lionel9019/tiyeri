@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>TIYERI IA - Gestion des Ressources Agricoles</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f6f8;
+    }
+    h1 {
+      text-align: center;
+      color: #006400;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+    th {
+      background-color: #e5f5e0;
+      color: #2e7d32;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 6px;
+      margin: 4px 0;
+    }
+    button {
+      padding: 8px 12px;
+      margin-top: 8px;
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1b5e20;
+    }
+    .form-section {
+      margin-bottom: 30px;
+      background-color: #ffffff;
+      padding: 15px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌿 Gestion des Ressources Agricoles</h1>
+
+  <!-- Section : Ajout / modification -->
+  <div class="form-section">
+    <h3>Ajouter ou Modifier une Culture</h3>
+    <form id="resource-form">
+      <input type="hidden" id="edit-id" />
+      <label>Culture :</label>
+      <input type="text" id="culture" required />
+
+      <label>Calendrier :</label>
+      <input type="text" id="calendrier" required />
+
+      <label>Rendement :</label>
+      <input type="text" id="rendement" required />
+
+      <label>Conseils :</label>
+      <textarea id="conseils" rows="3" required></textarea>
+
+      <button type="submit">💾 Enregistrer</button>
+    </form>
+  </div>
+
+  <!-- Liste des cultures -->
+  <h3>📋 Cultures en Base</h3>
+  <table id="resource-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Culture</th>
+        <th>Calendrier</th>
+        <th>Rendement</th>
+        <th>Conseils</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const apiUrl = "http://localhost:8000/api/calendrier";
+
+    const form = document.getElementById("resource-form");
+    const tbody = document.querySelector("#resource-table tbody");
+
+    function loadData() {
+      fetch(apiUrl)
+        .then(res => res.json())
+        .then(data => {
+          tbody.innerHTML = "";
+          data.forEach(resource => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${resource.id}</td>
+              <td>${resource.culture}</td>
+              <td>${resource.calendrier}</td>
+              <td>${resource.rendement}</td>
+              <td>${resource.conseils}</td>
+              <td>
+                <button onclick="editResource(${resource.id})">✏️ Modifier</button>
+                <button onclick="deleteResource(${resource.id})">🗑️ Supprimer</button>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        });
+    }
+
+    function editResource(id) {
+      fetch(`${apiUrl}/${id}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("edit-id").value = data.id;
+          document.getElementById("culture").value = data.culture;
+          document.getElementById("calendrier").value = data.calendrier;
+          document.getElementById("rendement").value = data.rendement;
+          document.getElementById("conseils").value = data.conseils;
+        });
+    }
+
+    function deleteResource(id) {
+      if (confirm("Voulez-vous vraiment supprimer cette culture ?")) {
+        fetch(`${apiUrl}/${id}`, {
+          method: "DELETE"
+        })
+        .then(() => loadData());
+      }
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const id = document.getElementById("edit-id").value;
+      const payload = {
+        culture: document.getElementById("culture").value,
+        calendrier: document.getElementById("calendrier").value,
+        rendement: document.getElementById("rendement").value,
+        conseils: document.getElementById("conseils").value
+      };
+
+      fetch(id ? `${apiUrl}/${id}` : apiUrl, {
+        method: id ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        form.reset();
+        loadData();
+      });
+    });
+
+    loadData();
+  </script>
+</body>
+</html>

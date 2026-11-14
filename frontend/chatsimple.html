@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test Chat Progressif HTML</title>
+  <style>
+    #chat-box {
+      height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Test Chat Progressif</h2>
+  <div id="chat-box"></div>
+  <button id="start">Afficher réponse IA</button>
+
+  <script>
+    async function afficherTexteProgressifHTML(element, html, vitesse = 50) {
+      element.innerHTML = "";
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = html;
+
+      async function afficherNoeud(noeud) {
+        if (noeud.nodeType === Node.TEXT_NODE) {
+          for (let char of noeud.textContent) {
+            element.innerHTML += char;
+            await new Promise(r => setTimeout(r, vitesse));
+            element.scrollTop = element.scrollHeight;
+          }
+        } else if (noeud.nodeType === Node.ELEMENT_NODE) {
+          const nouveauElem = document.createElement(noeud.tagName);
+          for (let attr of noeud.attributes) {
+            nouveauElem.setAttribute(attr.name, attr.value);
+          }
+          element.appendChild(nouveauElem);
+          for (let enfant of noeud.childNodes) {
+            await afficherNoeud(enfant);
+          }
+        }
+      }
+
+      for (let noeud of tempDiv.childNodes) {
+        await afficherNoeud(noeud);
+      }
+    }
+
+    document.getElementById('start').addEventListener('click', () => {
+      const chatBox = document.getElementById('chat-box');
+      const reponseHtml = `👋 Salut ! Je suis <strong>TIYERI</strong>, votre assistant agricole.<br/><em>Comment puis-je vous aider ?</em>`;
+      afficherTexteProgressifHTML(chatBox, reponseHtml, 50);
+    });
+  </script>
+</body>
+</html>

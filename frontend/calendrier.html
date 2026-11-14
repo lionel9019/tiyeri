@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Calendrier Cultural</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+    .modal-content { background: #fff; padding: 20px; border-radius: 8px; }
+    h2 { color: #2c662d; }
+    h3 { margin-top: 20px; color: #444; }
+    img.infographie {
+      max-width: 100%;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="modal-content">
+    <h2>🗓️ Calendrier Cultural</h2>
+    <p>Sélectionnez une culture pour voir les périodes optimales :</p>
+    <select id="culture-select">
+      <option value="">-- Choisir une culture --</option>
+    </select>
+    <div id="calendrier-resultat" style="margin-top: 20px;"></div>
+  </div>
+
+  <script>
+    let donneesCalendrier = {};
+
+    // Charger les données depuis l'API au chargement
+    window.addEventListener("DOMContentLoaded", () => {
+      fetch("http://localhost:8000/api/calendrier")
+        .then((response) => response.json())
+        .then((data) => {
+          donneesCalendrier = data.reduce((acc, item) => {
+            acc[item.culture.toLowerCase()] = item;
+            return acc;
+          }, {});
+
+          // Peupler la liste déroulante
+          const select = document.getElementById("culture-select");
+          Object.values(donneesCalendrier).forEach((item) => {
+            const option = document.createElement("option");
+            option.value = item.culture.toLowerCase();
+            option.textContent = "🌿 " + item.culture.charAt(0).toUpperCase() + item.culture.slice(1);
+            select.appendChild(option);
+          });
+        })
+        .catch((error) => {
+          console.error("Erreur lors du chargement du calendrier :", error);
+        });
+    });
+
+    // Réagir au changement de culture
+    document.getElementById("culture-select").addEventListener("change", (e) => {
+      const culture = e.target.value;
+      const result = document.getElementById("calendrier-resultat");
+
+      if (donneesCalendrier[culture]) {
+        const data = donneesCalendrier[culture];
+        result.innerHTML = `
+  <p><strong>🌱 Culture :</strong> ${data.culture}</p>
+  <p><strong>📅 Calendrier :</strong> ${data.calendrier}</p>
+  <p><strong>📈 Rendement :</strong> ${data.rendement}</p>
+  <p><strong>📌 Conseils :</strong> ${data.conseils}</p>
+
+  <hr>
+  <h3>📝 Résumé</h3>
+  <div>${data.resume ? data.resume : "<p>Aucun résumé disponible.</p>"}</div>
+
+  <hr>
+  <h3>📊 Infographie</h3>
+  ${
+    data.infographie && data.infographie.trim() !== ""
+      ? `<img class="infographie" 
+               src="/frontend/static/infographie_visuelle_calendrier_agricol/${data.infographie}" 
+               alt="Infographie ${data.culture}">`
+      : "<p>Aucune infographie disponible.</p>"
+  }
+`;
+      } else {
+        result.innerHTML = `<p style="color: red;">Aucune donnée disponible pour cette culture.</p>`;
+      }
+    });
+  </script>
+
+</body>
+</html>

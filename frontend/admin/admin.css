@@ -1,0 +1,83 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f2f7f5;
+  color: #333;
+}
+
+header {
+  background: #007E33;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+h1, h2 {
+  margin: 10px 0;
+}
+
+main {
+  padding: 20px;
+}
+
+.add-entry, .list-entries {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+form input, form textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+form button {
+  background: #007E33;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+form button:hover {
+  background: #005b25;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: #eef7f0;
+  border-left: 5px solid #007E33;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 6px;
+  position: relative;
+}
+
+li button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  margin-left: 10px;
+  background: #ff5252;
+  border: none;
+  color: white;
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+li button.edit {
+  background: #ffc107;
+  right: 60px;
+}

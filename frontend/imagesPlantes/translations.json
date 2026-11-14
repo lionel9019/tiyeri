@@ -1,0 +1,93 @@
+{
+  "fr": {
+    "menu_title": "🌿 Menu",
+    "new_chat": "📝 Nouveau Chat",
+    "diagnostic": "📷 Diagnostique Image/Plante",
+    "calendar": "🗓️ Calendrier Cultural",
+
+    "subscription_title": "⚡ Mon Abonnement",
+    "account_type": "Compte : --",
+    "subscription_type": "Type : --",
+    "days_left": "Jours restants : --",
+
+    "settings": "Paramètres",
+    "history": "📜 Historique :",
+    "see_conversations": "Voir les Conversations",
+
+    "my_conversations": "💬 Mes Conversations",
+    "loading": "Chargement...",
+
+    "language": "Langue",
+    "profile_photo": "Photo de profil",
+    "password": "Mot de passe",
+    "subscription": "Abonnement",
+
+    "choose_language": "Choix de la langue",
+    "validate": "Valider",
+
+    "update_profile": "Mettre à jour",
+    "change_password": "Changer le mot de passe",
+    "old_password": "Ancien mot de passe",
+    "new_password": "Nouveau mot de passe",
+    "change": "Changer",
+
+    "activate_subscription": "Activation d'un abonnement",
+    "choose_plan": "Choisissez un plan :",
+    "free": "Gratuit",
+    "premium": "Premium - 5€/mois",
+    "pro": "Pro - 15€/mois",
+    "activate": "Activer",
+
+    "ask_question": "Posez votre question...",
+    "send": "Envoyer",
+
+    "user": "Utilisateur",
+    "logout": "Déconnexion"
+  },
+
+  "en": {
+    "menu_title": "🌿 Menu",
+    "new_chat": "📝 New Chat",
+    "diagnostic": "📷 Image/Plant Diagnosis",
+    "calendar": "🗓️ Crop Calendar",
+
+    "subscription_title": "⚡ My Subscription",
+    "account_type": "Account: --",
+    "subscription_type": "Type: --",
+    "days_left": "Days left: --",
+
+    "settings": "Settings",
+    "history": "📜 History:",
+    "see_conversations": "View Conversations",
+
+    "my_conversations": "💬 My Conversations",
+    "loading": "Loading...",
+
+    "language": "Language",
+    "profile_photo": "Profile Picture",
+    "password": "Password",
+    "subscription": "Subscription",
+
+    "choose_language": "Choose a language",
+    "validate": "Validate",
+
+    "update_profile": "Update",
+    "change_password": "Change Password",
+    "old_password": "Old Password",
+    "new_password": "New Password",
+    "change": "Change",
+
+    "activate_subscription": "Activate a Subscription",
+    "choose_plan": "Choose a plan:",
+    "free": "Free",
+    "premium": "Premium - €5/month",
+    "pro": "Pro - €15/month",
+    "activate": "Activate",
+
+    "ask_question": "Ask your question...",
+    "send": "Send",
+
+    "user": "User",
+    "logout": "Logout"
+  }
+}

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Connexion Admin – TIYERI IA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f6fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      width: 350px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      background-color: #2980b9;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #1f6391;
+    }
+
+    #error-message {
+      color: red;
+      margin-top: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>🔐 Connexion Admin</h1>
+    <form id="login-form">
+      <input type="text" id="username" placeholder="username ou identifiant" required />
+      <input type="password" id="password" placeholder="Mot de passe" required />
+      <button type="submit">Se connecter</button>
+    </form>
+    <div id="error-message"></div>
+  </div>
+
+  <script>
+ 
+
+
+    const loginForm = document.getElementById("login-form");
+    const errorMessage = document.getElementById("error-message");
+
+    loginForm.addEventListener("submit", async (e) => {
+
+    
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+ 
+
+
+      try {
+         
+        // 1. Récupération du token
+        const res = await fetch("http://127.0.0.1:8000/admin/token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            username:username,
+            password:password
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Identifiants incorrects");
+        }
+
+        const data = await res.json();
+        const token = data.access_tokenAdmin;
+        localStorage.setItem("access_tokenAdmin", token);
+
+        // 2. Vérifie les infos de l'utilisateur
+        const meRes = await fetch("http://127.0.0.1:8000/admin/me", {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        });
+
+        if (!meRes.ok) {
+          throw new Error("Impossible de récupérer les informations.");
+        }
+
+        const userInfo = await meRes.json();
+
+       const role = (userInfo.role || "").toLowerCase().trim();
+if (!["admin", "super_admin", "administrateur"].includes(role)) {
+  localStorage.removeItem("access_tokenAdmin");
+  throw new Error("⛔ Accès réservé aux administrateurs.");
+}
+
+        // 3. Rediriger vers l'interface admin
+        window.location.href = "admin.html";
+
+      } catch (err) {
+        errorMessage.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>

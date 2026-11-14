@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>TIYERI IA - Diagnostic Agricole</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>🌿 IA TIYERI  </h1>
+    <p>Plateforme intelligente pour le diagnostic des cultures et conseils bio</p>
+    <button id="logout-btn" style="float: right; display: none;">Se déconnecter</button>
+  </header>
+
+  <main>
+    <!-- SECTION CONNEXION -->
+    <section id="login-section">
+      <h2>Connexion</h2>
+      <form id="login-form">
+        <input type="email" id="login-email" placeholder="Email" required />
+        <input type="password" id="login-password" placeholder="Mot de passe" required />
+        <button type="submit">Se connecter</button>
+      </form>
+      <p>
+        Pas de compte ? 
+        <button type="button" id="show-register-btn">Créer un compte</button>
+      </p>
+    </section>
+
+    <!-- SECTION INSCRIPTION -->
+    <section id="register-section" style="display: none;">
+      <h2>Inscription</h2>
+      <form id="register-form">
+        <input type="email" id="register-email" placeholder="Email" required />
+        <input type="password" id="register-password" placeholder="Mot de passe" required />
+        <button type="submit">S'inscrire</button>
+      </form>
+      <p>
+        Déjà un compte ? 
+        <button type="button" id="show-login-btn">Se connecter</button>
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 - TIYERI STARTUP | Kandi - Bénin. Tous droits réservés.<br/>Téléphone :📞 +229 0147780268 / 0158112896<br/>Email:📧 direction.generale@bioplantesinnove.org ou bio.plantesinnove@gmail.com</p>
+   </footer>
+
+  <script>
+    console.log("✅ Script chargé");
+
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("🎯 DOM chargé");
+
+      const loginSection = document.getElementById("login-section");
+      const registerSection = document.getElementById("register-section");
+
+      // 🔄 Bascule entre login/register
+      document.getElementById("show-register-btn").onclick = () => {
+        loginSection.style.display = "none";
+        registerSection.style.display = "block";
+      };
+      document.getElementById("show-login-btn").onclick = () => {
+        registerSection.style.display = "none";
+        loginSection.style.display = "block";
+      };
+
+      // 📝 Inscription
+      document.getElementById("register-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("register-email").value;
+        const password = document.getElementById("register-password").value;
+
+        try {
+          const response = await fetch("http://127.0.0.1:8000/api/users/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.detail || "Erreur d'inscription");
+          }
+
+          alert(data.message || "Inscription réussie !");
+          registerSection.style.display = "none";
+          loginSection.style.display = "block";
+        } catch (err) {
+          alert("Erreur d’inscription : " + err.message);
+        }
+      });
+
+      // 🔐 Connexion avec token JWT
+      document.getElementById("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("login-email").value;
+        const password = document.getElementById("login-password").value;
+
+        try {
+          const response = await fetch("http://127.0.0.1:8000/api/users/token", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+              username: email,
+              password: password
+            }),
+          });
+
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.detail || "Identifiants incorrects.");
+          }
+
+          const data = await response.json();
+          if (data.access_token) {
+            localStorage.setItem("access_token", data.access_token);
+            localStorage.setItem("username", email);
+            alert("Connexion réussie !");
+            window.location.href = "accueil.html";
+          } else {
+            alert("Réponse invalide du serveur.");
+          }
+        } catch (err) {
+          alert("Erreur de connexion : " + err.message);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
